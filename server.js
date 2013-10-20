@@ -23,6 +23,7 @@ function handler (req, res) {
 //user id assignment count
 //resets only on server restart
 var count = 1;
+var archive = "";
 
 //server socket event setup, upon successfull connection, 
 io.sockets.on('connection', function (socket) {
@@ -30,19 +31,14 @@ io.sockets.on('connection', function (socket) {
     //server informs client of its userId
     socket.emit('assignment', count++);
     
-    //finds oldest client connected, and retrieves its history
-    //newly connected client is sent this history
-        var clients = io.sockets.clients();
-        clients[0].emit('history', 'get', function(data) {
-           socket.emit('message', data);
-        });
+    //newly connected client is sent the archive of comments
+    socket.emit('message', archive);
 
     //receives message from a client and broadcasts it to other clients
     socket.on('message', function (msg, fn) { 
+        archive += '<p>' + msg + '</p>';
         socket.broadcast.emit('message', msg);
         fn('success');
     });
-    
-    //socket.on('disconnect', function () { });
 
 });
