@@ -29,10 +29,18 @@
         //form submission - sends message to server
         //on success, client updates itself and server broadcasts to other clients
         $('#submit').click(function () {
+            //input collection
             var name = $('#name').val();
             var msg = $('#message').val();
+            
+            //input validation
+            if($.trim(name) == '') { alert("Please enter your name."); return false; }
+            if($.trim(msg) == '') { alert("Please enter a comment."); return false; }
+            
+            //clear message field after submission, persist name
             $('#message').val('');
             
+            //send validated comment to server to be processed and broadcasted
             socket.emit('message', name + ': ' + msg, function (data) {
                 if(data == 'success')
                     $('#body').prepend('<p>' + name + ': ' + msg + '</p>');
