@@ -1,0 +1,68 @@
+<script type="text/javascript" src="http://codeorigin.jquery.com/jquery-2.0.3.min.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script type="text/javascript">
+    
+    $(document).ready(function () {
+        //set up websocket connection
+        var socket = io.connect('http://98.222.206.231:1337/');
+        
+        //set user id to -1 until connection is established
+        var userId = "-1";
+ 
+        //on connect, set up events
+        socket.on('connect', function () {
+        
+            //client receives message from server, add to comment body
+            socket.on('message', function(msg) {
+                $('#body').append('<p>' + msg + '</p>');
+            });
+            
+            //client receives user id assignment from server
+            //welcome message is prepended to html body, not comment body
+            socket.on('assignment', function(id) {
+               userId = id;
+                $('body').prepend('<h1>Connected! Welcome, user' + userId + '.</h2>');
+            });
+            
+            //client receives query for comment body contents
+            socket.on('history', function(method, fn) {
+                var bod = $('#body').html();
+                if(method == 'get')
+                    fn(bod);
+            });
+
+        });
+        
+        //form submission - sends message to server
+        //on success, client updates itself and server broadcasts to other clients
+        $('#submit').click(function () {
+            var msg = $('#message').val();
+            $('#message').val('');
+            
+            socket.emit('message', 'user' + userId + ' says: ' + msg, function (data) {
+                if(data == 'success')
+                    $('#body').append('<p>' + 'user' + userId + ' says: ' + msg + '</p>');
+            });
+        });
+    });
+    
+</script>
+
+<html>
+    <body>
+        <!--Comment Form-->
+        <textarea id="message" placeholder="enter comment here"></textarea>
+        <input id="submit" type="button" value="Submit" />
+        <!--End Comment Form-->
+        
+        <!--Comment Body-->
+        <div id="body"></div>
+        <!--End Comment Body-->
+        
+        <!--No Script-->
+        <noscript>
+            <img src="http://cdn.meme.li/i/p6vai.jpg">
+        </noscript>
+        <!--End No Script-->
+    </body>
+</html>
