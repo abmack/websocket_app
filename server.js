@@ -28,15 +28,12 @@ var archive = "";
 //server socket event setup, upon successfull connection, 
 io.sockets.on('connection', function (socket) {
     
-    //server informs client of its userId
-    socket.emit('assignment', count++);
-    
     //newly connected client is sent the archive of comments
     socket.emit('message', archive);
 
     //receives message from a client and broadcasts it to other clients
     socket.on('message', function (msg, fn) { 
-        archive += '<p>' + msg + '</p>';
+        archive = '<p>' + msg + '</p>' + archive;
         socket.broadcast.emit('message', msg);
         fn('success');
     });

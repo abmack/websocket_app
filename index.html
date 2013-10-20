@@ -14,14 +14,7 @@
         
             //client receives message from server, add to comment body
             socket.on('message', function(msg) {
-                $('#body').append('<p>' + msg + '</p>');
-            });
-            
-            //client receives user id assignment from server
-            //welcome message is prepended to html body, not comment body
-            socket.on('assignment', function(id) {
-               userId = id;
-                $('body').prepend('<h1>Connected! Welcome, user' + userId + '.</h2>');
+                $('#body').prepend('<p>' + msg + '</p>');
             });
             
             //client receives query for comment body contents
@@ -36,12 +29,13 @@
         //form submission - sends message to server
         //on success, client updates itself and server broadcasts to other clients
         $('#submit').click(function () {
+            var name = $('#name').val();
             var msg = $('#message').val();
             $('#message').val('');
             
-            socket.emit('message', 'user' + userId + ' says: ' + msg, function (data) {
+            socket.emit('message', name + ': ' + msg, function (data) {
                 if(data == 'success')
-                    $('#body').append('<p>' + 'user' + userId + ' says: ' + msg + '</p>');
+                    $('#body').prepend('<p>' + name + ': ' + msg + '</p>');
             });
         });
     });
@@ -51,7 +45,10 @@
 <html>
     <body>
         <!--Comment Form-->
-        <textarea id="message" placeholder="enter comment here"></textarea>
+        <label>name:</label><br />
+        <input id="name" type="text" placeholder="enter name here"><br />
+        <label>comment:</label><br />
+        <textarea id="message" placeholder="enter comment here"></textarea><br />
         <input id="submit" type="button" value="Submit" />
         <!--End Comment Form-->
         
