@@ -20,9 +20,7 @@ function handler (req, res) {
   });
 }
 
-//user id assignment count
 //resets only on server restart
-var count = 1;
 var archive = "";
 
 //server socket event setup, upon successfull connection, 
